@@ -1,0 +1,27 @@
+// Curated metadata and original short descriptions. Local cover art is illustrative.
+export const films=[
+['arrival','Arrival',2016,'Science fiction','Denis Villeneuve','A linguist searches for understanding when mysterious visitors arrive on Earth.'],
+['interstellar','Interstellar',2014,'Science fiction','Christopher Nolan','A pilot leaves a struggling Earth to explore possible homes beyond the solar system.'],
+['inception','Inception',2010,'Science fiction','Christopher Nolan','A specialist in shared dreams attempts a mission that blurs memory and reality.'],
+['martian','The Martian',2015,'Science fiction','Ridley Scott','An astronaut stranded on Mars uses science and ingenuity to survive.'],
+['spiderverse','Spider-Man: Into the Spider-Verse',2018,'Animation','Bob Persichetti, Peter Ramsey, Rodney Rothman','Miles Morales discovers that becoming a hero can take more than one form.'],
+['spirited','Spirited Away',2001,'Animation','Hayao Miyazaki','A young girl navigates an unfamiliar spirit world to find her way home.'],
+['wall-e','WALL-E',2008,'Animation','Andrew Stanton','A small cleanup robot finds an unexpected connection and a much bigger mission.'],
+['coco','Coco',2017,'Animation','Lee Unkrich','An aspiring musician follows his family’s story into a vibrant world of remembrance.'],
+['grandbudapest','The Grand Budapest Hotel',2014,'Comedy','Wes Anderson','A concierge and his young colleague become entangled in a colorful European adventure.'],
+['truman','The Truman Show',1998,'Drama','Peter Weir','A man begins to question the carefully ordered world around him.'],
+['whiplash','Whiplash',2014,'Drama','Damien Chazelle','A young drummer pursues excellence under a demanding teacher.'],
+['paddington','Paddington 2',2017,'Comedy','Paul King','A kindhearted bear works toward the perfect gift and finds himself in an unexpected predicament.'],
+['knives','Knives Out',2019,'Mystery','Rian Johnson','A detective investigates a novelist’s death among a family full of secrets.'],
+['prestige','The Prestige',2006,'Mystery','Christopher Nolan','Two stage magicians push their rivalry to increasingly costly extremes.'],
+['darkknight','The Dark Knight',2008,'Action','Christopher Nolan','Gotham’s protector confronts a criminal determined to undermine the city’s sense of order.'],
+['furyroad','Mad Max: Fury Road',2015,'Action','George Miller','An escape across a desert becomes a relentless struggle for freedom.'],
+['matrix','The Matrix',1999,'Science fiction','Lana Wachowski, Lilly Wachowski','A programmer discovers that the familiar world conceals a radically different reality.'],
+['eternal','Eternal Sunshine of the Spotless Mind',2004,'Romance','Michel Gondry','A couple’s memories become the setting for a story about love and loss.'],
+['before','Before Sunrise',1995,'Romance','Richard Linklater','Two travelers spend a night walking through Vienna and discovering each other.'],
+['amelie','Amélie',2001,'Romance','Jean-Pierre Jeunet','A shy Parisian quietly changes other people’s lives while searching for a connection of her own.'],
+['totoro','My Neighbor Totoro',1988,'Animation','Hayao Miyazaki','Two sisters find wonder and companionship in the countryside.'],
+['hunt','Hunt for the Wilderpeople',2016,'Comedy','Taika Waititi','An unlikely pair becomes the focus of a search through the New Zealand wilderness.'],
+['casablanca','Casablanca',1942,'Drama','Michael Curtiz','An old romance returns amid difficult choices in a wartime city.'],
+['rearwindow','Rear Window',1954,'Mystery','Alfred Hitchcock','A photographer confined to his apartment suspects that a neighbor has committed a crime.']
+].map(([id,title,year,genre,director,description])=>({id,title,year,genre,director,description,source:'Curated collection'}));

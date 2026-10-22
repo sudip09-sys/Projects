@@ -1,9 +1,37 @@
-# Sudip Sah — JavaScript project collection
+# Sudip Lab
 
-A responsive personal project gallery with eleven interactive demos. Open index.html in a browser or serve this directory with any static web server.
+A new browser-based JavaScript workspace built for Sudip Sah. Eleven tools share a responsive dashboard, favorites, project search, light/dark themes, and direct links such as `#tool/tasks`.
 
-## Attribution
+## Projects
 
-The demo HTML, CSS, and JavaScript were sourced from https://github.com/bhagirath-wscubetech/javascript-projects at commit 901a9ffd8861ab13c5ee71788f8fe464875a8c91. Portfolio layout and integration were added for Sudip Sah. These demos are credited to their original author; they are not represented as original work by Sudip.
+1. **Taskflow** — tasks, priorities, due dates, completion filters, search, undo removal, JSON export.
+2. **Noted** — searchable notes, autosave, pinning, color accents, text export.
+3. **Moment** — custom countdowns, saved events, live progress, expired-event handling.
+4. **Chroma** — five-color palettes, independent locks, hex/CSS copying, WCAG contrast calculation.
+5. **Keysmith** — cryptographic browser randomness, unbiased random sampling, 8–128 characters, guaranteed inclusion of selected character types, optional ambiguous-character exclusion.
+6. **Wordcraft** — locally generated placeholder copy across three themes, configurable paragraph/sentence counts, word counts, copy and download.
+7. **Frame** — five original SVG landscapes, wraparound navigation, keyboard controls, autoplay, artwork download.
+8. **Brainwave** — twelve shuffled questions, explanations, review, personal best, restart.
+9. **Devscope** — public GitHub profiles and up to 100 repositories, sorting, cached offline views, network/rate-limit handling.
+10. **Cinefind** — searchable 24-film local collection, genre filters, saved watchlist, optional live Apple catalog search. Local title cards are illustrative artwork.
+11. **Skyline** — city disambiguation, current weather, five-day forecast, Celsius/Fahrenheit, saved cities, timestamped cached forecasts.
 
-External APIs, fonts, icons, and images require internet access. Original API credentials may no longer work. The countdown retains its original expired 2022 target. Review the upstream repository's reuse terms before publishing its source.
+## Run
+
+Serve this folder with a static web server (ES modules require HTTP/HTTPS). No package installation or build step is needed. GitHub Pages publishes the repository root.
+
+Core behavior tests: `node --test tests/core.test.mjs`.
+
+## Privacy and persistence
+
+Tasks, notes, favorites, watchlists, city selections, cached public API responses, and preferences stay in localStorage in the current browser, under `sudip.v2.*`. Clearing browser storage removes them. There is no account sync or backend database. Passwords are never stored. Exports are initiated by the user. Browser clipboard access may need permission.
+
+## Services and assets
+
+- Weather and location data: [Open-Meteo](https://open-meteo.com/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- Public developer data: [GitHub REST API](https://docs.github.com/en/rest). Public rate limits apply.
+- Optional film search and film artwork: [Apple Search API](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/). Availability and cross-origin access depend on the service. The local film collection works without it.
+- Fonts: Google Fonts (DM Sans, Manrope), with system-font fallbacks.
+- Landscape illustrations and film title cards: new SVG/CSS artwork in this project.
+
+This version replaces the earlier demo collection with a new implementation. Earlier versions remain in normal Git history. No third-party API keys are embedded. Network features report errors rather than presenting fabricated live data.

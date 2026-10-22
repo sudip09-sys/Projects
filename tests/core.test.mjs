@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {makePassword,characterSets,contrast,timeParts,slideIndex,randomInt,shuffled,escapeHTML,weatherLabel} from '../core.mjs';
+import {projects,questions} from '../data.mjs';
+import {films} from '../films.mjs';
+test('passwords meet length and selected character constraints across all combinations',()=>{const keys=Object.keys(characterSets);for(let mask=1;mask<16;mask++){const groups=keys.filter((_,i)=>mask&(1<<i));for(const length of [8,20,128]){const p=makePassword(length,groups);assert.equal(p.length,length);for(const key of groups)assert.ok([...p].some(c=>characterSets[key].includes(c)));assert.ok([...p].every(c=>groups.some(k=>characterSets[k].includes(c))))}}});
+test('ambiguous characters are excluded and empty selections fail without recursion',()=>{for(let i=0;i<30;i++)assert.doesNotMatch(makePassword(64,Object.keys(characterSets),true),/[O0Il1|]/);assert.throws(()=>makePassword(20,[]));for(const n of [0,7,129,NaN,8.5])assert.throws(()=>makePassword(n,['lower']))});
+test('secure random bounds and shuffle preserve every input',()=>{for(const size of [1,2,3,26,1000])for(let i=0;i<100;i++){const n=randomInt(size);assert.ok(n>=0&&n<size)}assert.throws(()=>randomInt(0));const input=[1,2,3,4,5];assert.deepEqual(shuffled(input).sort(),input);assert.deepEqual(input,[1,2,3,4,5])});
+test('WCAG contrast reference values',()=>{assert.equal(contrast('#000000','#ffffff'),21);assert.equal(contrast('#123456','#123456'),1);assert.ok(Math.abs(contrast('#777777','#ffffff')-4.478)<.01);assert.throws(()=>contrast('red','#ffffff'))});
+test('countdown clamps past dates and decomposes future time',()=>{assert.deepEqual(timeParts(-1000),{days:0,hours:0,minutes:0,seconds:0});assert.deepEqual(timeParts((86400+7200+180+4)*1000),{days:1,hours:2,minutes:3,seconds:4})});
+test('gallery wraps both ends',()=>{assert.equal(slideIndex(-1,5),4);assert.equal(slideIndex(5,5),0);assert.equal(slideIndex(-11,5),4)});
+test('untrusted text is escaped',()=>{assert.equal(escapeHTML('<img onerror="x">&'), '&lt;img onerror=&quot;x&quot;&gt;&amp;')});
+test('catalogs and quiz content are internally complete',()=>{assert.equal(projects.length,11);assert.equal(new Set(projects.map(x=>x.id)).size,11);assert.equal(questions.length,12);for(const q of questions){assert.equal(q.a.length,4);assert.ok(q.correct>=0&&q.correct<4);assert.ok(q.why.length>20)}assert.equal(films.length,24);assert.equal(new Set(films.map(f=>f.id)).size,24);assert.deepEqual(weatherLabel(0),['☀','Clear sky']);assert.equal(weatherLabel(95)[1],'Thunderstorms')});
