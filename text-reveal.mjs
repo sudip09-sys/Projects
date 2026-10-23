@@ -9,7 +9,7 @@ export function scrambleFrame(text,progress,phase=0){
 export const wordParts=text=>text.match(/\s+|\S+/gu)||[];
 export function installTextReveal(isPaused){
   const root=document.querySelector('main'),known=new WeakMap(),running=new Map();
-  const selectors='.hero-copy h1,.hero-copy .eyebrow,.hero-copy>p,.maker-lockup strong,.maker-lockup small,.hero-cta,.hero-links>a,.hero-scroll-note,.mini-stats strong,.mini-stats>div>span,.new-heading>span,.new-heading h2,.new-heading p,.new-links strong,.new-links small,.recent-tools h2,.recent-links a,.collection-label,#projects-title,.section-title p,.card-number,.card-body>.category,.card-body h3,.card-body p,.feature-row .badge,.open-project,.studio-footer h2,.studio-footer>p';
+  const selectors='.hero-copy h1,#projects-title,.new-heading h2,.studio-footer h2,.card-body h3,.tool-heading h1,#tool h2';
   let raf=0;
   function paint(record,progress,phase=0){
     const cells=scrambleGlyphs(record.text,progress,phase);
@@ -26,7 +26,7 @@ export function installTextReveal(isPaused){
     }
     raf=running.size?requestAnimationFrame(frame):0;
   }
-  function play(record,duration=record.hero?1800:1000){
+  function play(record,duration=record.hero?1400:650){
     if(isPaused()){restore(record);return;}
     record.played=true;record.lastPlayed=performance.now();
     running.set(record.element,{record,start:record.lastPlayed,duration,phase:-1});
@@ -37,11 +37,10 @@ export function installTextReveal(isPaused){
     if(entry.isIntersecting){const record=known.get(entry.target);if(record)play(record);observer.unobserve(entry.target);}
   }),{threshold:.25});
   function scan(){
-    if(!document.body.classList.contains('landing'))return;
     root.querySelectorAll(selectors).forEach(element=>{
       const existing=known.get(element);
       if(existing){if(!existing.played&&!isPaused())observer.observe(element);return;}
-      if(element.closest('form,[contenteditable],#tool')||element.querySelector('input,textarea,select'))return;
+      if(element.closest('form,[contenteditable]')||element.querySelector('input,textarea,select'))return;
       const nodes=[],walker=document.createTreeWalker(element,NodeFilter.SHOW_TEXT);
       while(walker.nextNode())if(walker.currentNode.textContent.trim()&&!walker.currentNode.parentElement.closest('[aria-hidden="true"],.decode-word'))nodes.push(walker.currentNode);
       if(!nodes.length)return;
@@ -59,7 +58,7 @@ export function installTextReveal(isPaused){
         node.replaceWith(fragment);
       });
       element.dataset.decoding='false';
-      element.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!running.has(element)&&performance.now()-record.lastPlayed>2500)play(record,record.hero?1400:850);});
+      if(record.hero)element.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!running.has(element)&&performance.now()-record.lastPlayed>6000)play(record,1100);});
       if(!isPaused())observer.observe(element);
     });
     root.querySelectorAll('[data-replay-text]').forEach(b=>{b.disabled=isPaused();b.title=isPaused()?'Resume motion to enable text reveal':'Replay the visible text';});
