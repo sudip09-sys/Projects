@@ -1,4 +1,4 @@
-import {tasks,notes,countdown} from './productivity.mjs?v=20261023d';
-import {colors,password,text,gallery} from './creative.mjs?v=20261023d';
-import {quiz,github,movies,weather} from './explore.mjs?v=20261023d';
+import {tasks,notes,countdown} from './productivity.mjs?v=20261023e';
+import {colors,password,text,gallery} from './creative.mjs?v=20261023e';
+import {quiz,github,movies,weather} from './explore.mjs?v=20261023e';
 export function mountTool(id,root){return ({tasks,notes,countdown,colors,password,text,gallery,quiz,github,movies,weather})[id](root)}

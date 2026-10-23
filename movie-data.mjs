@@ -14,8 +14,8 @@ export function normalizeMoviePages(data) {
   if(data?.error) throw Error(data.error.info||'Online movie search is temporarily unavailable.');
   return Object.values(data?.query?.pages??{}).filter(page=>{
     if(!Number.isInteger(page.pageid)||page.pageid<1||!page.title||page.missing!==undefined) return false;
-    if(/^(list of|category:)|soundtrack|film editor|languages|\(novel\)/i.test(page.title)) return false;
-    return /\bfilms?\b|\bmovie\b/i.test(page.extract??'')||/\bfilm\)/i.test(page.title);
+    if(/^(list of|category:)|soundtrack|film editor|languages|\(novel\)|\(disambiguation\)/i.test(page.title)) return false;
+    return /\bfilm\)/i.test(page.title)||/\b(?:is|was) an? [^.!?]{0,160}\b(?:film|movie)\b(?!\s+(?:award|critic|festival|registry|society|company|production|studio|industry|fund|journal))/i.test(page.extract??'');
   }).sort((a,b)=>(a.index??0)-(b.index??0)).map(page=>{
     let artwork='';
     try { const url=new URL(page.thumbnail?.source); if(url.protocol==='https:'&&url.hostname==='upload.wikimedia.org') artwork=url.href; } catch {}
@@ -23,3 +23,4 @@ export function normalizeMoviePages(data) {
     return {id:'wiki-'+page.pageid,title:page.title,year:(extract.match(/\b(?:18|19|20)\d{2}\b/)??[''])[0],genre:'Film',director:'Wikipedia',description:extract,artwork,url:safeMovieLink(page.fullurl||'https://en.wikipedia.org/?curid='+page.pageid,page.title),imagePage:page.pageimage?'https://en.wikipedia.org/wiki/File:'+encodeURIComponent(page.pageimage):'',source:'Wikipedia · CC BY-SA 4.0'};
   });
 }
+

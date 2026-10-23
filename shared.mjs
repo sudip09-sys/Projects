@@ -1,4 +1,4 @@
-import {escapeHTML} from './core.mjs?v=20261023d';
+import {escapeHTML} from './core.mjs?v=20261023e';
 export const esc=escapeHTML;
 export const $=(s,root=document)=>root.querySelector(s);
 export const $$=(s,root=document)=>[...root.querySelectorAll(s)];
