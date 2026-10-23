@@ -1,6 +1,6 @@
 # Sudip Lab
 
-A new browser-based JavaScript workspace built for Sudip Sah. Eleven tools share a responsive dashboard, favorites, project search, light/dark themes, and direct links such as `#tool/tasks`.
+A new browser-based JavaScript workspace built for Sudip Sah. Fourteen distinct projects share a responsive dashboard, favorites, project search, light/dark themes, and direct links such as `#tool/tasks`.
 
 ## Projects
 

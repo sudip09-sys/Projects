@@ -1,3 +1,4 @@
+import {buildProjects} from './project-collection.mjs?v=20261023projects';
 export const projects=[
 {id:'tasks',name:'Taskflow',tagline:'Make room for what matters.',description:'A focused task board with priorities, due dates, filters, and undo.',category:'Productivity',icon:'✓',color:'mint',features:['Due dates','Saved locally'],number:'01'},
 {id:'notes',name:'Noted',tagline:'A home for your next idea.',description:'Searchable, color-coded notes with autosave, pinning, and export.',category:'Productivity',icon:'▤',color:'sand',features:['Autosave','Export notes'],number:'02'},
@@ -9,7 +10,7 @@ export const projects=[
 {id:'quiz',name:'Brainwave',tagline:'A little challenge goes a long way.',description:'Take a shuffled web-development quiz with explanations and a best score.',category:'Explore',icon:'?',color:'sand',features:['12 questions','Answer explanations'],number:'08'},
 {id:'github',name:'Devscope',tagline:'Meet the person behind the code.',description:'Explore GitHub profiles, repository languages, and popular projects.',category:'Explore',icon:'⌘',color:'blue',features:['Live GitHub API','Repository sorting'],number:'09'},
 {id:'movies',name:'Cinefind',tagline:'Your next movie night starts here.',description:'Search films, browse details, and build a personal watchlist.',category:'Explore',icon:'▶',color:'peach',features:['Movie search','Saved watchlist'],number:'10'},
-{id:'weather',name:'Skyline',tagline:'A better window to the weather.',description:'Explore current conditions and a five-day forecast for cities worldwide.',category:'Explore',icon:'☀',color:'mint',features:['No API key','5-day forecast'],number:'11'}];
+{id:'weather',name:'Skyline',tagline:'A better window to the weather.',description:'Explore current conditions and a five-day forecast for cities worldwide.',category:'Explore',icon:'☀',color:'mint',features:['No API key','5-day forecast'],number:'11'},...buildProjects];
 export const questions=[
 {q:'Which declaration creates a block-scoped variable that can be reassigned?',a:['const','let','var','static'],correct:1,why:'let is block-scoped and allows reassignment. const is block-scoped but cannot be reassigned.',topic:'JavaScript'},
 {q:'Which array method returns a new array after transforming each element?',a:['forEach','push','map','sort'],correct:2,why:'map returns a new array containing the result of calling a function for each element.',topic:'JavaScript'},

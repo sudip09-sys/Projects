@@ -10,4 +10,6 @@ test('WCAG contrast reference values',()=>{assert.equal(contrast('#000000','#fff
 test('countdown clamps past dates and decomposes future time',()=>{assert.deepEqual(timeParts(-1000),{days:0,hours:0,minutes:0,seconds:0});assert.deepEqual(timeParts((86400+7200+180+4)*1000),{days:1,hours:2,minutes:3,seconds:4})});
 test('gallery wraps both ends',()=>{assert.equal(slideIndex(-1,5),4);assert.equal(slideIndex(5,5),0);assert.equal(slideIndex(-11,5),4)});
 test('untrusted text is escaped',()=>{assert.equal(escapeHTML('<img onerror="x">&'), '&lt;img onerror=&quot;x&quot;&gt;&amp;')});
-test('catalogs and quiz content are internally complete',()=>{assert.equal(projects.length,11);assert.equal(new Set(projects.map(x=>x.id)).size,11);assert.equal(questions.length,12);for(const q of questions){assert.equal(q.a.length,4);assert.ok(q.correct>=0&&q.correct<4);assert.ok(q.why.length>20)}assert.equal(films.length,24);assert.equal(new Set(films.map(f=>f.id)).size,24);assert.deepEqual(weatherLabel(0),['☀','Clear sky']);assert.equal(weatherLabel(95)[1],'Thunderstorms')});
+test('catalogs and quiz content are internally complete',()=>{assert.equal(projects.length,14);assert.equal(new Set(projects.map(x=>x.id)).size,projects.length);assert.equal(questions.length,12);for(const q of questions){assert.equal(q.a.length,4);assert.ok(q.correct>=0&&q.correct<4);assert.ok(q.why.length>20)}assert.equal(films.length,24);assert.equal(new Set(films.map(f=>f.id)).size,24);assert.deepEqual(weatherLabel(0),['☀','Clear sky']);assert.equal(weatherLabel(95)[1],'Thunderstorms')});
+
+
