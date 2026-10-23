@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {spherePoints,projectPoint,motionAllowed} from '../motion-math.mjs';
+test('code globe points remain on a unit sphere',()=>{const p=spherePoints(150);assert.equal(p.length,150);for(const v of p)assert.ok(Math.abs(Math.hypot(v.x,v.y,v.z)-1)<1e-8)});
+test('animated projection remains finite over rotations and pointer positions',()=>{for(const p of spherePoints(30))for(const a of [0,1,Math.PI,20]){const v=projectPoint(p,a,180,600,300,1,-1);assert.ok(Number.isFinite(v.x)&&Number.isFinite(v.y));assert.ok(v.depth>=0&&v.depth<=1)}});
+test('pause, reduced motion, and hidden tabs each stop animation',()=>{assert.equal(motionAllowed(false,false,false),true);for(const args of [[true,false,false],[false,true,false],[false,false,true]])assert.equal(motionAllowed(...args),false)});
