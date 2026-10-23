@@ -1,6 +1,5 @@
 /** Sudip Lab / Sudip Sah / original four-bar song sketches and a live piano. */
 import { presets, stepEvents, midiFrequency, stepSeconds } from './presets.js';
-import { classicalPresets, classicalStep, classicalKeyboard, swarLabel, teentaal } from './classical.js';
 const $ = (id) => document.getElementById(id);
 const status = $('status'), play = $('play'), tempo = $('tempo'), loop = $('loop');
 class StudioAudio {
@@ -8,6 +7,9 @@ class StudioAudio {
     master;
     analyser;
     noise;
+    delay = null;
+    feedback = null;
+    wet = null;
     voices = new Set();
     tracks = {};
     async ready() { if (!this.context) {
@@ -31,7 +33,9 @@ class StudioAudio {
         const samples = this.noise.getChannelData(0);
         for (let i = 0; i < samples.length; i++)
             samples[i] = Math.random() * 2 - 1;
-    } await this.context.resume(); this.mix(); }
+    } await this.context.resume(); this.mix(); this.effects(); }
+    effects() { if (this.delay || !this.context)
+        return; const c = this.context; this.delay = c.createDelay(1); this.feedback = c.createGain(); this.wet = c.createGain(); this.delay.delayTime.value = preset.echo ?? .13; this.feedback.gain.value = .26; this.wet.gain.value = preset.influence ? .22 : .07; this.tracks.melody.connect(this.delay); this.delay.connect(this.feedback); this.feedback.connect(this.delay); this.delay.connect(this.wet); this.wet.connect(this.master); }
     mix() { if (!this.context)
         return; this.master.gain.setTargetAtTime(Number($('volume').value) / 100, this.context.currentTime, .02); for (const [name, g] of Object.entries(this.tracks))
         g.gain.setTargetAtTime($(name + '-track').checked ? 1 : 0, this.context.currentTime, .015); }
@@ -41,7 +45,7 @@ class StudioAudio {
     }
     else
         source.connect(gain); gain.connect(this.tracks[track]); this.voices.add(source); source.onended = () => { this.voices.delete(source); source.disconnect(); gain.disconnect(); filter?.disconnect(); }; }
-    note(midi, time, duration, volume, wave, track = 'melody') { const c = this.context; const voice = c.createOscillator(), gain = c.createGain(), filter = c.createBiquadFilter(); voice.type = wave; voice.frequency.value = midiFrequency(midi); filter.type = 'lowpass'; filter.frequency.value = wave === 'sawtooth' ? 1400 : 4200; gain.gain.setValueAtTime(0, time); gain.gain.linearRampToValueAtTime(volume, time + .008); gain.gain.exponentialRampToValueAtTime(.0001, time + duration); this.connect(voice, gain, track, filter); voice.start(time); voice.stop(time + duration + .02); }
+    note(midi, time, duration, volume, wave, track = 'melody', tone = 4200, attack = .008) { const c = this.context; const voice = c.createOscillator(), gain = c.createGain(), filter = c.createBiquadFilter(); voice.type = wave; voice.frequency.value = midiFrequency(midi); filter.type = 'lowpass'; filter.frequency.value = tone === 4200 && wave === 'sawtooth' ? 1400 : tone; gain.gain.setValueAtTime(0, time); gain.gain.linearRampToValueAtTime(volume, time + Math.min(attack, duration * .3)); gain.gain.exponentialRampToValueAtTime(.0001, time + duration); this.connect(voice, gain, track, filter); voice.start(time); voice.stop(time + duration + .02); }
     drum(kind, time) { const c = this.context, gain = c.createGain(); if (kind === 'kick') {
         const voice = c.createOscillator();
         voice.frequency.setValueAtTime(145, time);
@@ -69,22 +73,20 @@ class StudioAudio {
             voice.stop();
         }
         catch { }
-    } this.voices.clear(); }
+    } this.voices.clear(); if (this.delay) {
+        this.tracks.melody.disconnect(this.delay);
+        this.delay.disconnect();
+        this.feedback?.disconnect();
+        this.wet?.disconnect();
+        this.delay = null;
+        this.feedback = null;
+        this.wet = null;
+    } }
 }
 const audio = new StudioAudio();
 let preset = presets[0], running = false, cursor = 0, nextTime = 0, timer = null, generation = 0;
-let classical = null;
 let queue = [], custom = null, customLoading = false;
-const pianoNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'], bindings = ['a', 's', 'd', 'f', 'g', 'h', 'j'];
-let pianoMidi = [60, 62, 64, 65, 67, 69, 71], pianoLabels = [...pianoNotes];
-function updateKeyboard() { const keys = classical ? classicalKeyboard(classical.raga, Number($('tonic').value)) : pianoNotes.map((label, i) => ({ label, midi: [60, 62, 64, 65, 67, 69, 71][i] })); pianoMidi = keys.map(k => k.midi); pianoLabels = keys.map(k => k.label); Array.from($('piano').children).forEach((b, i) => { b.textContent = keys[i].label + ' / ' + bindings[i].toUpperCase(); b.setAttribute('aria-label', 'Play ' + keys[i].label); }); $('piano-help').textContent = classical ? 'The keys follow ' + classical.raga.name + ' at your chosen Sa. A S D F G H J play the displayed swaras. Komal means lowered; tivra means raised; ′ marks the upper octave.' : 'Click the keys or use A S D F G H J. The modern sketches use C major / A minor. Space plays or pauses outside a control.'; }
-function classicUI() { const enabled = Boolean(classical); $('raga-guide').hidden = !enabled; $('tonic-control').hidden = !enabled; $('drums-label').textContent = enabled ? 'Tabla pulse' : 'Drums'; $('bass-label').textContent = enabled ? 'Sa–Pa drone' : 'Bass'; $('melody-label').textContent = enabled ? 'Sargam / taan' : 'Melody & chords'; document.querySelectorAll('[data-classical]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.classical === classical?.id))); if (classical) {
-    const r = classical.raga;
-    $('raga-scale').textContent = 'Aaroh: ' + [...r.labels, 'Sa′'].join(' · ');
-    $('raga-descent').textContent = 'Avaroh: ' + ['Sa′', ...r.labels.slice().reverse()].join(' · ');
-    $('current-swar').textContent = 'Sa';
-} updateKeyboard(); }
-function selectClassical(p) { pause(); custom = null; classical = p; cursor = 0; tempo.disabled = false; tempo.value = String(p.bpm); $('tempo-value').textContent = p.bpm + ' BPM'; $('selected-name').textContent = p.name; $('selected-style').textContent = p.raga.hindi + ' / ' + p.kind + ' / Teentaal · 16 matras'; $('position').textContent = 'Ready / 16 matras'; document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', 'false')); $('melody').replaceChildren(); classicUI(); renderPattern(); announce(p.name + ' selected. Press Play.'); }
+const pianoNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'], pianoMidi = [60, 62, 64, 65, 67, 69, 71], bindings = ['a', 's', 'd', 'f', 'g', 'h', 'j'];
 function announce(text) { status.textContent = text; }
 function buttonState() { play.textContent = running ? 'Pause' : 'Play'; play.setAttribute('aria-pressed', String(running)); }
 function pause() { generation++; if (running) {
@@ -93,42 +95,28 @@ function pause() { generation++; if (running) {
         cursor = future.step;
 } running = false; if (timer !== null)
     clearInterval(timer); timer = null; queue = []; audio.stop(); $('level').value = 0; buttonState(); }
-function reset() { pause(); cursor = 0; $('current-swar').textContent = 'Sa'; document.querySelectorAll('[data-matra].current').forEach(e => e.classList.remove('current')); document.querySelectorAll('.step.current').forEach(e => e.classList.remove('current')); $('position').textContent = classical ? 'Ready / 16 matras' : 'Ready / 4 bars'; $('level').value = 0; announce(custom ? 'JSON melody ready' : (classical?.name ?? preset.name) + ' ready'); }
+function reset() { pause(); cursor = 0; document.querySelectorAll('.step.current').forEach(e => e.classList.remove('current')); $('position').textContent = 'Ready / 4 bars'; $('level').value = 0; announce(custom ? 'JSON melody ready' : preset.name + ' ready'); }
 function renderPattern() { const grid = $('sequencer'); grid.replaceChildren(); for (const track of ['kick', 'snare', 'hat', 'melody']) {
     const label = document.createElement('span');
     label.className = 'track-label';
-    label.textContent = classical ? ({ kick: 'bayan', snare: 'dayan', hat: '', melody: 'swar' }[track] ?? track) : track;
+    label.textContent = track;
     grid.append(label);
     for (let i = 0; i < 16; i++) {
         const cell = document.createElement('i');
         cell.className = 'step';
         cell.dataset.step = String(i);
-        const event = classical ? classicalStep(classical, i, Number($('tonic').value)) : stepEvents(preset, i);
+        const event = stepEvents(preset, i);
         if (event[track])
             cell.classList.add('on', track);
         grid.append(cell);
     }
 } }
-function select(next) { pause(); custom = null; classical = null; cursor = 0; tempo.disabled = false; preset = next; classicUI(); tempo.value = String(next.bpm); $('tempo-value').textContent = next.bpm + ' BPM'; $('selected-name').textContent = next.name; $('selected-style').textContent = next.style + ' / ' + (next.minor ? 'A minor' : 'C major') + ' / 4 bars'; document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === next.id))); $('melody').replaceChildren(); $('position').textContent = 'Ready / 4 bars'; renderPattern(); announce(next.name + ' selected. Press Play.'); }
+function select(next) { pause(); custom = null; cursor = 0; tempo.disabled = false; preset = next; tempo.value = String(next.bpm); $('tempo-value').textContent = next.bpm + ' BPM'; $('selected-name').textContent = next.name; $('selected-style').textContent = next.style + (next.influence ? ' / ' + next.influence + '-inspired' : '') + ' / ' + (next.minor ? 'A minor' : 'C major') + ' / 4 bars'; document.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === next.id))); $('melody').replaceChildren(); $('position').textContent = 'Ready / 4 bars'; renderPattern(); announce(next.name + ' selected. Press Play.'); }
 function schedule(step, time) {
     if (custom) {
         const n = custom[step];
         audio.note(n.note, time, Math.max(.07, n.duration / 1000 * .85), .25, 'triangle');
         return n.duration / 1000;
-    }
-    if (classical) {
-        const tonic = Number($('tonic').value), e = classicalStep(classical, step, tonic), seconds = stepSeconds(Number(tempo.value), 0, step);
-        if (e.bol) {
-            const voiced = e.bol === 'Dha' || e.bol === 'Dhin';
-            if (voiced)
-                audio.note(tonic - 12, time, .25, .28, 'sine', 'drums');
-            audio.note(tonic + (e.bol === 'Tin' ? 7 : 0), time, e.bol === 'Dhin' ? .32 : .12, .16, 'triangle', 'drums');
-            audio.note(tonic + 19, time, .07, .035, 'sine', 'drums');
-        }
-        if (e.melody)
-            audio.note(e.melody, time, seconds * (classical.kind === 'Sargam' ? 3.6 : 1.8), .2, 'triangle');
-        e.drone.forEach(n => audio.note(n, time, seconds * 15, .065, 'sine', 'bass'));
-        return seconds;
     }
     const events = stepEvents(preset, step), seconds = stepSeconds(Number(tempo.value), preset.swing, step);
     if (events.kick)
@@ -138,10 +126,10 @@ function schedule(step, time) {
     if (events.hat)
         audio.drum('hat', time);
     if (events.melody)
-        audio.note(events.melody, time, seconds * 2.5, .17, preset.wave);
+        audio.note(events.melody, time, seconds * 2.5, .17, preset.wave, 'melody', preset.leadTone ?? 4200, preset.leadAttack ?? .008);
     if (events.bass)
         audio.note(events.bass, time, seconds * 2.8, .28, 'sine', 'bass');
-    events.chord.forEach(n => audio.note(n, time, seconds * 13, .045, 'sine', 'melody'));
+    events.chord.forEach(n => audio.note(n, time, seconds * 13, .045, preset.padWave ?? 'sine', 'melody', preset.influence ? 1100 : 4200, preset.influence ? .09 : .008));
     return seconds;
 }
 function pump() {
@@ -176,13 +164,7 @@ function pump() {
         current = queue.shift().step;
     if (current !== undefined) {
         document.querySelectorAll('.step').forEach(cell => cell.classList.toggle('current', Number(cell.dataset.step) === current % 16));
-        if (classical) {
-            const e = classicalStep(classical, current, Number($('tonic').value));
-            document.querySelectorAll('[data-matra]').forEach(b => b.classList.toggle('current', Number(b.dataset.matra) === e.beat));
-            if (e.melody)
-                $('current-swar').textContent = swarLabel(classical.raga, e.melody - Number($('tonic').value));
-        }
-        $('position').textContent = classical ? 'Matra ' + (Math.floor(current / 4) + 1) + ' / 16 · ' + teentaal[Math.floor(current / 4)] : custom ? 'Note ' + (current + 1) + ' / ' + custom.length : 'Bar ' + (Math.floor(current / 16) + 1) + ' / 4 · Beat ' + (Math.floor(current % 16 / 4) + 1);
+        $('position').textContent = custom ? 'Note ' + (current + 1) + ' / ' + custom.length : 'Bar ' + (Math.floor(current / 16) + 1) + ' / 4 · Beat ' + (Math.floor(current % 16 / 4) + 1);
     }
     const samples = new Float32Array(audio.analyser.fftSize);
     audio.analyser.getFloatTimeDomainData(samples);
@@ -200,7 +182,7 @@ async function toggle() { if (running) {
     running = true;
     nextTime = audio.context.currentTime + .04;
     buttonState();
-    announce('Playing ' + (custom ? 'JSON melody' : (classical?.name ?? preset.name)));
+    announce('Playing ' + (custom ? 'JSON melody' : preset.name));
     pump();
     timer = setInterval(pump, 35);
 }
@@ -217,7 +199,7 @@ async function manual(index) { try {
     key.classList.add('active');
     setTimeout(() => key.classList.remove('active'), 180);
     if (!running)
-        announce('Playing ' + pianoLabels[index]);
+        announce('Playing ' + pianoNotes[index]);
 }
 catch {
     announce('Audio unavailable. Click Play to try again.');
@@ -231,9 +213,7 @@ async function loadMelody() { pause(); cursor = 0; const token = generation; cus
         throw Error('Invalid melody');
     if (token !== generation)
         return;
-    custom = value.map(n => ({ note: [60, 62, 64, 65, 67, 69, 71][pianoNotes.indexOf(n.note)], duration: n.duration }));
-    classical = null;
-    classicUI();
+    custom = value.map(n => ({ note: pianoMidi[pianoNotes.indexOf(n.note)], duration: n.duration }));
     tempo.disabled = true;
     $('selected-name').textContent = 'JSON piano melody';
     $('selected-style').textContent = 'Piano only / original exercise';
@@ -252,33 +232,18 @@ finally {
     customLoading = false;
     $('load').disabled = false;
 } }
-teentaal.forEach((bol, i) => { const b = document.createElement('span'); b.dataset.matra = String(i); b.textContent = (i === 0 ? '× ' : i === 4 ? '2 ' : i === 8 ? '0 ' : i === 12 ? '3 ' : '') + (i + 1) + ' ' + bol; $('taal-bols').append(b); });
-for (const p of classicalPresets) {
-    const b = document.createElement('button');
-    b.className = 'preset classical-preset';
-    b.dataset.classical = p.id;
-    b.setAttribute('aria-pressed', 'false');
-    const small = document.createElement('small'), name = document.createElement('strong'), meta = document.createElement('span');
-    small.textContent = p.raga.hindi + ' / ' + p.kind;
-    name.textContent = p.raga.name;
-    meta.textContent = p.bpm + ' BPM · Teentaal';
-    b.append(small, name, meta);
-    b.addEventListener('click', () => selectClassical(p));
-    $('classical-presets').append(b);
-}
-$('tonic').addEventListener('change', () => { reset(); classicUI(); });
 for (const p of presets) {
     const b = document.createElement('button');
     b.className = 'preset';
     b.dataset.preset = p.id;
     b.setAttribute('aria-pressed', 'false');
     const style = document.createElement('small'), name = document.createElement('strong'), bpm = document.createElement('span');
-    style.textContent = p.style;
+    style.textContent = p.influence ?? p.style;
     name.textContent = p.name;
-    bpm.textContent = p.bpm + ' BPM';
+    bpm.textContent = p.style + ' · ' + p.bpm + ' BPM';
     b.append(style, name, bpm);
     b.addEventListener('click', () => select(p));
-    $('presets').append(b);
+    $(p.influence ? 'sessions' : 'presets').append(b);
 }
 for (let i = 0; i < 7; i++) {
     const b = document.createElement('button');
@@ -310,4 +275,4 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && run
     announce('Paused while this tab is hidden.');
 } });
 window.addEventListener('pagehide', pause);
-select(preset);
+select(presets.find(p => p.id === 'afterglow'));
