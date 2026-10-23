@@ -1,8 +1,8 @@
-import {buildProjects,previewMarkup} from './project-collection.mjs?v=20261024subtle';
-import {startExperience} from './experience.mjs?v=20261024subtle';
-import {projects} from './data.mjs?v=20261024subtle';
-import {$,$$,esc,storage,toast,empty} from './shared.mjs?v=20261024subtle';
-import {mountTool} from './tools.mjs?v=20261024subtle';
+import {buildProjects,previewMarkup} from './project-collection.mjs?v=20261024beats';
+import {startExperience} from './experience.mjs?v=20261024beats';
+import {projects} from './data.mjs?v=20261024beats';
+import {$,$$,esc,storage,toast,empty} from './shared.mjs?v=20261024beats';
+import {mountTool} from './tools.mjs?v=20261024beats';
 const categories=['All',...new Set(projects.map(p=>p.category))];
 const main=$('#main');
 let cleanup=()=>{},category='All',query='';
