@@ -1,6 +1,6 @@
-import {projects} from './data.mjs';
-import {$,$$,esc,storage,toast,empty} from './shared.mjs';
-import {mountTool} from './tools.mjs';
+import {projects} from './data.mjs?v=20261023b';
+import {$,$$,esc,storage,toast,empty} from './shared.mjs?v=20261023b';
+import {mountTool} from './tools.mjs?v=20261023b';
 const main=$('#main');let cleanup=()=>{};let category='All',query='';let favorites=storage.get('favorites',[]);if(!Array.isArray(favorites))favorites=[];
 function syncFavorites(){$('#favorite-count').textContent=favorites.length}
 function card(p){return `<article class="project-card"><div class="card-art ${p.color}"><span class="card-number">PROJECT ${p.number}</span><span class="symbol" aria-hidden="true">${p.icon}</span><button class="favorite" data-favorite="${p.id}" aria-label="${favorites.includes(p.id)?'Remove':'Add'} ${p.name} ${favorites.includes(p.id)?'from':'to'} favorites" aria-pressed="${favorites.includes(p.id)}">${favorites.includes(p.id)?'♥':'♡'}</button></div><div class="card-body"><span class="category">${p.category}</span><h3>${p.name}</h3><p>${p.description}</p><div class="feature-row">${p.features.map(f=>`<span class="badge">${f}</span>`).join('')}</div><a class="open-project" href="#tool/${p.id}">Open project <span aria-hidden="true">↗</span></a></div></article>`}
