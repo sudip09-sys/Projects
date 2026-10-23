@@ -41,3 +41,23 @@ This version replaces the earlier demo collection with a new implementation. Ear
 Project-specific `AGENTS.md` adapts [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)'s existing-code-first workflow for this buildless app. Its MIT notice is retained in `licenses/ponytail-MIT.txt`. It adds no runtime dependency or global agent installation.
 
 The homepage now reuses locally saved tool history for a recently opened shortcut row. Cinefind defaults to online search, explicitly requests poster images, exposes direct source links, provides poster source/rights links, and falls back honestly when an image is absent. Its focused data-normalization tests cover missing images, invalid links, and non-film results. Run the full suite with `node --test tests/*.test.mjs`.
+## New: Build & play
+
+Only three distinct apps were added to the original eleven:
+
+12. **Memory Match** — solo and two-player matching, configurable difficulty, hints, scores, and turns.
+13. **Melody Studio** — typed piano with keyboard controls, synthesized audio, JSON melodies, pause, and reset.
+14. **Signal Chat** — Angular messenger with local demo accounts, cross-tab live messages, remembered contacts, and notifications.
+
+The existing Brainwave quiz remains the only quiz. Earlier memory, piano and messenger variations were consolidated rather than listed as duplicate apps. Existing tools and sudip.v2.* user data remain intact. No lecture PDFs, slides, audio recordings or podcast files are included.
+
+## Complete code package
+
+[Download the entire repository](https://github.com/sudip09-sys/Projects/archive/refs/heads/main.zip). New apps include compiled runnable builds and editable source under projects/. For memory and piano, run npm install and npm run build in their folders. For Signal Chat, run those commands in projects/signal-chat/source/.
+
+To package the code locally with Python 3, run: python scripts/package.py. The archive excludes Git metadata, dependencies and generated downloads.
+
+Signal Chat is an educational browser-local demo, not production authentication. Use demo passwords. The guide contact is simulated. Live REST/WebSocket endpoints can be configured, but external backend/VPN connectivity has not been verified.
+
+Checks: node --test tests/*.test.mjs and node --test projects/signal-chat/tests/conversation.test.mjs.
+
