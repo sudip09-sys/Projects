@@ -13,7 +13,7 @@ A new browser-based JavaScript workspace built for Sudip Sah. Eleven tools share
 7. **Frame** — five original SVG landscapes, wraparound navigation, keyboard controls, autoplay, artwork download.
 8. **Brainwave** — twelve shuffled questions, explanations, review, personal best, restart.
 9. **Devscope** — public GitHub profiles and up to 100 repositories, sorting, cached offline views, network/rate-limit handling.
-10. **Cinefind** — searchable 24-film local collection, genre filters, saved watchlist, optional live Apple catalog search. Local title cards are illustrative artwork.
+10. **Cinefind** — searchable 24-film local collection, genre filters, saved watchlist, optional live Wikipedia film search. Local title cards are illustrative artwork.
 11. **Skyline** — city disambiguation, current weather, five-day forecast, Celsius/Fahrenheit, saved cities, timestamped cached forecasts.
 
 ## Run
@@ -30,7 +30,7 @@ Tasks, notes, favorites, watchlists, city selections, cached public API response
 
 - Weather and location data: [Open-Meteo](https://open-meteo.com/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - Public developer data: [GitHub REST API](https://docs.github.com/en/rest). Public rate limits apply.
-- Optional film search and film artwork: [Apple Search API](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/). Availability and cross-origin access depend on the service. The local film collection works without it.
+- Optional film search and film artwork: [Wikipedia MediaWiki API](https://www.mediawiki.org/wiki/API:Main_page). Availability and cross-origin access depend on the service. The local film collection works without it.
 - Fonts: Google Fonts (DM Sans, Manrope), with system-font fallbacks.
 - Landscape illustrations and film title cards: new SVG/CSS artwork in this project.
 
