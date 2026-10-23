@@ -29,4 +29,4 @@ body.landing{--bg:#09090b;--surface:#101012;--ink:#eeece5;--muted:#96948e;--line
 body.landing{overflow-x:hidden}.landing .code-hero{min-height:700px}.landing .hero-copy{width:61%}.landing h1{font-size:clamp(40px,4.6vw,66px)}
 @media(max-width:1000px){.landing h1{font-size:48px}.landing .hero-copy{width:68%}}
 @media(max-width:700px){.landing .hero-copy{width:100%}.landing h1{font-size:48px}}
-@media(max-width:560px){.landing h1{font-size:clamp(31px,8.7vw,45px)}.landing .code-hero{min-height:680px}}
+@media(max-width:560px){.landing h1{font-size:clamp(31px,8.7vw,45px)}.landing .code-hero{min-height:680px}}html:has(body.landing){overflow-x:clip}.landing .shell{overflow-x:clip}
