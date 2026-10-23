@@ -35,3 +35,9 @@ Tasks, notes, favorites, watchlists, city selections, cached public API response
 - Landscape illustrations and film title cards: new SVG/CSS artwork in this project.
 
 This version replaces the earlier demo collection with a new implementation. Earlier versions remain in normal Git history. No third-party API keys are embedded. Network features report errors rather than presenting fabricated live data.
+
+## Ponytail-inspired maintenance
+
+Project-specific `AGENTS.md` adapts [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)'s existing-code-first workflow for this buildless app. Its MIT notice is retained in `licenses/ponytail-MIT.txt`. It adds no runtime dependency or global agent installation.
+
+The homepage now reuses locally saved tool history for a recently opened shortcut row. Cinefind defaults to online search, explicitly requests poster images, exposes direct source links, provides poster source/rights links, and falls back honestly when an image is absent. Its focused data-normalization tests cover missing images, invalid links, and non-film results. Run the full suite with `node --test tests/*.test.mjs`.
