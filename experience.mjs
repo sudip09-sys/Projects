@@ -1,6 +1,6 @@
-import {installTextReveal} from './text-reveal.mjs?v=20261023premium';
-import {storage} from './shared.mjs?v=20261023premium';
-import {spherePoints,projectPoint,motionAllowed} from './motion-math.mjs?v=20261023premium';
+import {installTextReveal} from './text-reveal.mjs?v=20261024codeface';
+import {storage} from './shared.mjs?v=20261024codeface';
+import {spherePoints,projectPoint,motionAllowed} from './motion-math.mjs?v=20261024codeface';
 export function startExperience(){
   const canvas=document.createElement('canvas');canvas.id='ambient-code';canvas.setAttribute('aria-hidden','true');document.body.prepend(canvas);
   const ctx=canvas.getContext('2d'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -28,7 +28,7 @@ export function startExperience(){
     }
     ctx.strokeStyle='rgba(184,169,198,'+(mobile?.06:.14)+')';ctx.lineWidth=.7;ctx.beginPath();ctx.ellipse(cx,cy,radius*1.3,radius*.38,-.36,0,Math.PI*2);ctx.stroke();
   }
-  function canAnimate(){return ctx&&hero&&heroVisible&&motionAllowed(paused,reduced.matches,document.hidden);}
+  function canAnimate(){return ctx&&hero&&heroVisible&&!hero.querySelector('.hero-emblem')&&motionAllowed(paused,reduced.matches,document.hidden);}
   function frame(now){
     if(!canAnimate()){raf=0;return;}
     if(!last||now-last>=40){time+=last?Math.min((now-last)/1000,.1):0;last=now;draw();}

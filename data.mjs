@@ -1,4 +1,4 @@
-import {buildProjects} from './project-collection.mjs?v=20261023premium';
+import {buildProjects} from './project-collection.mjs?v=20261024codeface';
 export const projects=[
 {id:'tasks',name:'Taskflow',tagline:'Make room for what matters.',description:'A focused task board with priorities, due dates, filters, and undo.',category:'Productivity',icon:'✓',color:'mint',features:['Due dates','Saved locally'],number:'01'},
 {id:'notes',name:'Noted',tagline:'A home for your next idea.',description:'Searchable, color-coded notes with autosave, pinning, and export.',category:'Productivity',icon:'▤',color:'sand',features:['Autosave','Export notes'],number:'02'},
