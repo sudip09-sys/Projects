@@ -1,8 +1,8 @@
-import {buildProjects,previewMarkup} from './project-collection.mjs?v=20261024codeface';
-import {startExperience} from './experience.mjs?v=20261024codeface';
-import {projects} from './data.mjs?v=20261024codeface';
-import {$,$$,esc,storage,toast,empty} from './shared.mjs?v=20261024codeface';
-import {mountTool} from './tools.mjs?v=20261024codeface';
+import {buildProjects,previewMarkup} from './project-collection.mjs?v=20261024words';
+import {startExperience} from './experience.mjs?v=20261024words';
+import {projects} from './data.mjs?v=20261024words';
+import {$,$$,esc,storage,toast,empty} from './shared.mjs?v=20261024words';
+import {mountTool} from './tools.mjs?v=20261024words';
 const categories=['All',...new Set(projects.map(p=>p.category))];
 const main=$('#main');
 let cleanup=()=>{},category='All',query='';

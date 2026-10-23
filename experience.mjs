@@ -1,6 +1,6 @@
-import {installTextReveal} from './text-reveal.mjs?v=20261024codeface';
-import {storage} from './shared.mjs?v=20261024codeface';
-import {spherePoints,projectPoint,motionAllowed} from './motion-math.mjs?v=20261024codeface';
+import {installTextReveal} from './text-reveal.mjs?v=20261024words';
+import {storage} from './shared.mjs?v=20261024words';
+import {spherePoints,projectPoint,motionAllowed} from './motion-math.mjs?v=20261024words';
 export function startExperience(){
   const canvas=document.createElement('canvas');canvas.id='ambient-code';canvas.setAttribute('aria-hidden','true');document.body.prepend(canvas);
   const ctx=canvas.getContext('2d'),reduced=matchMedia('(prefers-reduced-motion: reduce)');

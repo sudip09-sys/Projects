@@ -6,55 +6,65 @@ export function scrambleGlyphs(text,progress,phase=0){
 export function scrambleFrame(text,progress,phase=0){
   return scrambleGlyphs(text,progress,phase).map(g=>g.char).join('');
 }
+export const wordParts=text=>text.match(/\s+|\S+/gu)||[];
 export function installTextReveal(isPaused){
   const root=document.querySelector('main'),known=new WeakMap(),running=new Map();
-  const selectors='.hero-copy h1,#projects-title,.new-heading h2';
+  const selectors='.hero-copy h1,.hero-copy .eyebrow,.hero-copy>p,.maker-lockup strong,.maker-lockup small,.hero-cta,.hero-links>a,.hero-scroll-note,.mini-stats strong,.mini-stats>div>span,.new-heading>span,.new-heading h2,.new-heading p,.new-links strong,.new-links small,.recent-tools h2,.recent-links a,.collection-label,#projects-title,.section-title p,.card-number,.card-body>.category,.card-body h3,.card-body p,.feature-row .badge,.open-project,.studio-footer h2,.studio-footer>p';
   let raf=0;
   function paint(record,progress,phase=0){
-    const cells=scrambleGlyphs(record.text,progress,phase);let i=0;
-    record.segments.forEach(s=>s.glyphs.forEach(g=>{const cell=cells[i++];g.textContent=cell.char;if(cell.tint)g.dataset.tint=cell.tint;else delete g.dataset.tint;}));
+    const cells=scrambleGlyphs(record.text,progress,phase);
+    record.glyphs.forEach((g,i)=>{if(!g)return;const cell=cells[i];if(g.textContent!==cell.char)g.textContent=cell.char;if(cell.tint)g.dataset.tint=cell.tint;else delete g.dataset.tint;});
   }
   function restore(record){paint(record,1);record.element.dataset.decoding='false';}
   function frame(now){
     for(const [element,task] of running){
       if(!element.isConnected){running.delete(element);continue;}
       if(isPaused()){restore(task.record);running.delete(element);continue;}
-      const progress=Math.min(1,(now-task.start)/task.duration);
-      paint(task.record,progress,Math.floor((now-task.start)/75));
+      const progress=Math.min(1,(now-task.start)/task.duration),phase=Math.floor((now-task.start)/60);
+      if(phase!==task.phase||progress===1){paint(task.record,progress,phase);task.phase=phase;}
       if(progress===1){restore(task.record);running.delete(element);}
     }
     raf=running.size?requestAnimationFrame(frame):0;
   }
-  function play(record,duration=record.hero?1800:780){
+  function play(record,duration=record.hero?1800:1000){
     if(isPaused()){restore(record);return;}
     record.played=true;record.lastPlayed=performance.now();
-    running.set(record.element,{record,start:record.lastPlayed,duration});
-    record.element.dataset.decoding='true';
-    paint(record,0);
+    running.set(record.element,{record,start:record.lastPlayed,duration,phase:-1});
+    record.element.dataset.decoding='true';paint(record,0);
     if(!raf)raf=requestAnimationFrame(frame);
   }
   const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
     if(entry.isIntersecting){const record=known.get(entry.target);if(record)play(record);observer.unobserve(entry.target);}
-  }),{threshold:.4});
+  }),{threshold:.25});
   function scan(){
+    if(!document.body.classList.contains('landing'))return;
     root.querySelectorAll(selectors).forEach(element=>{
       const existing=known.get(element);
       if(existing){if(!existing.played&&!isPaused())observer.observe(element);return;}
-      if(element.closest('form,button,a,[contenteditable],#tool'))return;
+      if(element.closest('form,[contenteditable],#tool')||element.querySelector('input,textarea,select'))return;
       const nodes=[],walker=document.createTreeWalker(element,NodeFilter.SHOW_TEXT);
-      while(walker.nextNode())if(walker.currentNode.textContent.trim())nodes.push(walker.currentNode);
+      while(walker.nextNode())if(walker.currentNode.textContent.trim()&&!walker.currentNode.parentElement.closest('[aria-hidden="true"],.decode-word'))nodes.push(walker.currentNode);
       if(!nodes.length)return;
-      const record={element,text:nodes.map(n=>n.textContent).join(''),segments:[],hero:element.matches('.hero-copy h1'),played:false,lastPlayed:0};
+      const record={element,text:nodes.map(n=>n.textContent).join(''),glyphs:[],hero:element.matches('.hero-copy h1'),played:false,lastPlayed:0};
       known.set(element,record);
-      element.setAttribute('aria-label',element.innerText.replace(/\s+/g,' ').trim());
-      nodes.forEach(node=>{const span=document.createElement('span');span.className='decode-text';span.setAttribute('aria-hidden','true');const glyphs=Array.from(node.textContent,c=>{const g=document.createElement('span');g.className='decode-glyph';g.textContent=c;span.append(g);return g;});record.segments.push({span,text:node.textContent,glyphs});node.replaceWith(span);});
+      nodes.forEach(node=>{
+        const fragment=document.createElement('span');fragment.className='decode-segment';
+        wordParts(node.textContent).forEach(part=>{
+          if(/^\s+$/.test(part)){fragment.append(document.createTextNode(part));record.glyphs.push(...Array.from(part,()=>null));return;}
+          const word=document.createElement('span'),original=document.createElement('span'),overlay=document.createElement('span');
+          word.className='decode-word';original.className='decode-original';original.textContent=part;overlay.className='decode-text';overlay.setAttribute('aria-hidden','true');
+          Array.from(part,c=>{const g=document.createElement('span');g.className='decode-glyph';g.textContent=c;overlay.append(g);record.glyphs.push(g);});
+          word.append(original,overlay);fragment.append(word);
+        });
+        node.replaceWith(fragment);
+      });
       element.dataset.decoding='false';
-      if(record.hero)element.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!running.has(element)&&performance.now()-record.lastPlayed>4000)play(record,1400);});
+      element.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&!running.has(element)&&performance.now()-record.lastPlayed>2500)play(record,record.hero?1400:850);});
       if(!isPaused())observer.observe(element);
     });
-    root.querySelectorAll('[data-replay-text]').forEach(b=>{b.disabled=isPaused();b.title=isPaused()?'Resume motion to enable text reveal':'Watch code turn into words';});
+    root.querySelectorAll('[data-replay-text]').forEach(b=>{b.disabled=isPaused();b.title=isPaused()?'Resume motion to enable text reveal':'Replay the visible text';});
   }
-  document.addEventListener('click',event=>{if(event.target.closest('[data-replay-text]'))root.querySelectorAll('.hero-copy h1').forEach(el=>{const record=known.get(el);if(record&&!running.has(el))play(record);});});
+  document.addEventListener('click',event=>{if(event.target.closest('[data-replay-text]'))root.querySelectorAll(selectors).forEach(el=>{const record=known.get(el),rect=el.getBoundingClientRect();if(record&&!running.has(el)&&rect.bottom>0&&rect.top<innerHeight)play(record);});});
   new MutationObserver(records=>{if(records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1)))scan();}).observe(root,{childList:true,subtree:true});
   scan();
   return {finishAll(){cancelAnimationFrame(raf);raf=0;running.forEach(task=>restore(task.record));running.clear();scan();}};
